@@ -51,6 +51,10 @@
     return (
       <Router>
       <div>
+        <nav className="navbar">
+          Welcome to, Adani University Result Portal
+        </nav>
+        
         <Routes>
         <Route path="/admin" element={<Admin />} />
         <Route
@@ -59,7 +63,7 @@
           <div className="login-container">
              <Link to="/admin">Admin Portal</Link>
 
-            <h1>Welcome to, Adani University Result Portal</h1>
+            <h1></h1>
             <input
             type="text"
             placeholder="Enrollment No"
