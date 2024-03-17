@@ -1,9 +1,8 @@
+// backend/routes/admin.js
 import express from 'express';
 import multer from 'multer';
 import xlsx from 'xlsx';
-import Student from '../models/students.cjs';
-
-// rest of your code
+import mongoose from 'mongoose';
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -14,15 +13,26 @@ router.post('/uploadFile', upload.single('file'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded.' });
     }
-    console.log('File received:', req.file);
+
     const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
-    console.log('Workbook:', workbook);
+    const sheetName = workbook.SheetNames[0];
+    const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-    const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+    // Extract column headers
+    const columnHeaders = Object.keys(jsonData[0]);
 
-    await Student.insertMany(jsonData);
-    console.log('Data inserted successfully.');
-    
+    // Create dynamic schema
+    const dynamicSchemaFields = {};
+    columnHeaders.forEach(header => {
+      dynamicSchemaFields[header] = { type: String, required: true };
+    });
+
+    const dynamicSchema = new mongoose.Schema(dynamicSchemaFields);
+    const DynamicModel = mongoose.model('DynamicModel', dynamicSchema);
+
+    // Insert data into the collection
+    await DynamicModel.insertMany(jsonData);
+
     res.json({ message: 'Data imported successfully.' });
   } catch (error) {
     console.error('Error processing file:', error);

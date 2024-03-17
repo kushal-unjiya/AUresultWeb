@@ -1,17 +1,25 @@
 // backend/routes/student.js
 import express from 'express';
-import Student from '../models/students.cjs';
-
+import mongoose from 'mongoose';
+/// import DynamicModel from './admin.js';
 const router = express.Router();
 
+    const studentSchema = new mongoose.Schema({
+      enrollmentNo: { type: String, required: true },
+      seatNo: { type: String, required: true },
+      semester: { type: String, required: true },
+    });
+
+    const DynamicModel = mongoose.model('DynamicModel',studentSchema);
+
 router.post('/getResult', async (req, res) => {
-  const { enrollmentNo, seatNo, semester,cgpa} = req.body;
+  const { enrollmentNo, seatNo, semester } = req.body;
   console.log("fetching result")
   try {
     // Log the incoming request
     console.log('Incoming request to /api/getResult:', req.body);
 
-    const result = await Student.findOne({
+    const result = await DynamicModel.findOne({
       enrollmentNo,
       seatNo,
       semester,
