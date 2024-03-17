@@ -5,7 +5,13 @@ const Result = ({ resultData }) => {
   return (
     <div>
       <h2>Result:</h2>
-      <pre>{JSON.stringify(resultData, null, 2)}</pre>
+      <div>
+        {/* Render the resultData directly */}
+        <p>Enrollment No: {resultData.enrollmentNo}</p>
+        <p>Seat No: {resultData.seatNo}</p>
+        <p>Semester: {resultData.semester}</p>
+        {/* Add other fields as needed */}
+      </div>
       <Link to="/">Go back to Student Portal</Link>
     </div>
   );
