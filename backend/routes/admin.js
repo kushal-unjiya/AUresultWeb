@@ -1,4 +1,3 @@
-// backend/routes/admin.js
 import express from 'express';
 import multer from 'multer';
 import xlsx from 'xlsx';
@@ -18,17 +17,25 @@ router.post('/uploadFile', upload.single('file'), async (req, res) => {
     const sheetName = workbook.SheetNames[0];
     const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-    // Extract column headers
     const columnHeaders = Object.keys(jsonData[0]);
-
-    // Create dynamic schema
     const dynamicSchemaFields = {};
     columnHeaders.forEach(header => {
       dynamicSchemaFields[header] = { type: String, required: true };
     });
 
-    const dynamicSchema = new mongoose.Schema(dynamicSchemaFields);
-    const DynamicModel = mongoose.model('DynamicModel', dynamicSchema);
+    // Define a base schema
+    const baseSchema = new mongoose.Schema({
+      // Define common fields here if needed
+    });
+
+    // Check if DynamicModel already exists
+    let DynamicModel;
+    try {
+      DynamicModel = mongoose.model('DynamicModel');
+      DynamicModel.schema.add(dynamicSchemaFields);
+    } catch (error) {
+      DynamicModel = mongoose.model('DynamicModel', baseSchema.add(dynamicSchemaFields));
+    }
 
     // Insert data into the collection
     await DynamicModel.insertMany(jsonData);
